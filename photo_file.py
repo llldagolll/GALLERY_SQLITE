@@ -5,10 +5,15 @@ from PIL import Image
 BASE_DIR = os.path.dirname(__file__)
 DATA_FILE = BASE_DIR + '/data/photos.sqlite3'
 FILES_DIR = BASE_DIR + '/files'
+MUSICS_DIR = BASE_DIR + '/musics'
+
 
 # 画像ファイルの保存パスを返す --- (*2)
 def get_path(file_id, ptype = ''):
-	return FILES_DIR + '/' + str(file_id) + ptype + '.jpg' 
+	return FILES_DIR + '/' + str(file_id) + ptype + '.jpg'
+
+def get_musicpath(file_id, ptype = ''):
+    return MUSICS_DIR + '/' + str(file_id) + ptype + '.mp3'
 
 # サムネイルを作成する --- (*3)
 def make_thumbnail(file_id, size):
