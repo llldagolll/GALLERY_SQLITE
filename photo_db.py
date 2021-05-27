@@ -1,14 +1,18 @@
 import re, photo_file, photo_sqlite
 from photo_sqlite import exec, select
 
+
+
+#題名と説明文追加
 def title_new(user_id, args):
     name = args.get('name', '')
     if name == "": return 0
     album_id = exec(
-        'INSERT INTO albums (name, user_id) VALUES (?,?)',
+        'INSERT INTO albums (name, user_id, description) VALUES (?,?)',
         name, user_id)
     
     return album_id
+
 
 # # 新規アルバムを作成 --- (*1)
 # def album_new(user_id, args):
@@ -38,6 +42,7 @@ def get_album_name(album_id):
     a = get_album(album_id)
     if a == None: return '未分類'
     return a['name']
+
 
 # アップロードされたファイルを保存 --- (*5)
 def save_file(user_id, upfile, album_id):
@@ -84,6 +89,9 @@ def save_file_music(user_id, upmusicfile, album_id):
     upmusicfile.save(photo_file.get_musicpath(music_id))
     return music_id
 
+
+
+
 # ファイルに関する情報を得る --- (*9)
 def get_file(file_id, ptype):
     # データベースから基本情報を得る
@@ -106,6 +114,8 @@ def get_musicfile(music_id, ptype):
     p['musicpath'] = photo_file.get_musicpath(music_id)
 
     return p
+
+
 
 
 
@@ -140,9 +150,18 @@ def get_album_files(album_id):
 
 #アルバムに入っている音楽ファイルの一覧を得る
 def get_album_musicfiles(album_id):
-    return select('''
+    #youtubeURLが入っているのかmp3ファイルがはいっているのか判定する
+
+
+
+    a = select('''
         SELECT * FROM musics WHERE album_id=?
         ORDER BY music_id DESC''', album_id)
+
+    # b = select('''
+    #     SELECT * FROM musics WHERE album_id=?
+    #     ORDER BY music_id DESC''', album_id)
+    return a
 
 
 # ユーザーのファイルの一覧を得る --- (*13)

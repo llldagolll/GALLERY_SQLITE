@@ -1,0 +1,58 @@
+{% extends "layout_login.html" %}
+
+{% block title %}{{ album.name }}{% endblock %}
+
+{% block contents %}
+<h3>{{ album.user_id }}さんの写真</h3>
+<div class="photo_list">
+{% for i in photos %}
+  <div class="photo">
+    <div class="photo_border">
+      <a href="/photo/{{ i.file_id }}">
+        <img src="/photo/{{ i.file_id }}"
+             width="300">
+      </a><br>
+      {% for i in musics %}
+      <audio controls>
+        <source src="/music/{{ i.music_id }}">
+      </audio>
+      {% endfor %}
+      <span class="datetime">{{ i.created_at }}</span>
+  </div><br>
+  <!-- https://youtu.be/x8VYWazR5mE
+  <iframe width="200" height="100" src="https://www.youtube.com/embed/x8VYWazR5mE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+
+
+
+
+  </div> -->
+{% endfor %}
+</div>
+
+<div class = "photo_list">
+<p>{{ album.description }}</p>
+</div>
+
+<br>
+
+<div class="info_box">
+  <a class="pure-button"
+    href="/user/{{ album.user_id }}">
+    {{ album.user_id }}さんの作品集へ</a>
+</div>
+<br>
+<!-- <form action="/update">
+<div class="info_box">
+  <legend>音楽を設定</legend>
+  <div class="pure-control-group">
+    <label for="upmusicfile">MP3ファイルを選択:</label>
+    <input type="file" name="upmusicfile" id="upmusicfile" required>
+  <div class="pure-controls">
+    <button type="submit" class="pure-button pure-button-primary">
+    更新</button>
+</div>
+</form> -->
+{% endblock %}
+

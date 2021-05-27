@@ -19,16 +19,31 @@
       {% endfor %}
       <span class="datetime">{{ i.created_at }}</span>
   </div><br>
-  </div>
+  <!-- https://youtu.be/x8VYWazR5mE
+  <iframe width="200" height="100" src="https://www.youtube.com/embed/x8VYWazR5mE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+
+
+
+
+  </div> -->
 {% endfor %}
 </div>
 
-<!-- <audio src="/music/1"></audio> -->
-<div>
-
+<div class = "photo_list">
+<p>{{ album.description }}</p>
+</div>
+<div class = "photo_list">
+  <button onclick="location.href='/edit'" class="pure-button pure-button-primary">編集</button>
+  <br>
+  <br>
+  <form action="/delete">
+  <button type="submit" class="pure-button pure-button-primary">投稿削除</button>
+  </form>
 </div>
 
-
+<br>
 
 <div class="info_box">
   <a class="pure-button"

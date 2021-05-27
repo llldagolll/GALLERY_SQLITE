@@ -5,14 +5,22 @@ from photo_sqlite import select, exec
 
 
 
+# USER_LOGIN_LIST = select(
+#                     'SELECT user_id, password FROM users'
+# )
 
-title = select('''
-    SELECT album_id FROM albums WHERE user_id = ? and name = ?  
-''', user_id, name)
+# print(USER_LOGIN_LIST)
 
-album_id = title[0]['album_id']       
 
-print(album_id)
+
+
+# title = select('''
+#     SELECT album_id FROM albums WHERE user_id = ? and name = ?  
+# ''', user_id, name)
+
+# album_id = title[0]['album_id']       
+
+# print(album_id)
 
 # title = select('''
 #     SELECT album_id FROM albums WHERE user_id = 'sabu' and name = 'kun'  

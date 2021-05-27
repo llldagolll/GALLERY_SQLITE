@@ -3,25 +3,33 @@ from flask import render_template, send_file
 import photo_db, sns_user as user # 自作モジュールを取り込む
 from photo_sqlite import exec, select
 from sns_user import session
+import os
+import photo_file
 
 app = Flask(__name__)
 app.secret_key = 'dpwvgAxaY2iWHMb2'
 
-# ログイン処理を実現する --- (*1)
+# ログイン画面表示--- (*1)
 @app.route('/login')
 def login():
     return render_template('login_form.html')
 
+#ログイン処理
 @app.route('/login/try', methods=['POST'])
 def login_try():
     ok = user.try_login(request.form)
+
     if not ok: return msg('ログイン失敗')
     return redirect('/')
 
+
+#新規登録画面表示
 @app.route('/register')
 def register():
     return render_template('register_form.html')
 
+
+#新規登録処理
 @app.route('/register/try', methods=['POST'])
 def register_try():
     res = {}
@@ -73,14 +81,99 @@ def index():
 @user.login_required
 def album_show(album_id):
     album = photo_db.get_album(album_id)
-    session['user_id'] = album['user_id']
-    session['album_id'] = album['album_id']
+    photos = photo_db.get_album_files(album_id)
+    musics = photo_db.get_album_musicfiles(album_id)
+    # youtubemusics = photo_db.get_album_youtube(album_id)
+    # session['user_id'] = album['user_id']
 
+    # print(path)
+
+
+    session['album_id'] = album['album_id']
+    # session['file_id'] = album['']
     print(session)
+
+    # if session['user_id'] == album['user_id']: 
+
+    if session['user_id'] == album['user_id']:
     
-    return render_template('album.html',
-            album=album,
-            photos=photo_db.get_album_files(album_id),musics=photo_db.get_album_musicfiles(album_id))
+        return render_template('album.html',
+                album=album,
+                photos=photos,musics=musics)
+
+    elif session['user_id'] != album['user_id']:
+        return render_template('album_viewer.html',
+                album=album,
+                photos=photos,
+                musics=musics)
+
+@app.route('/edit')
+@user.login_required
+def edit():
+    album_id = session['album_id']
+    album = photo_db.get_album(album_id)
+    photos = photo_db.get_album_files(album_id)
+    musics = photo_db.get_album_musicfiles(album_id)
+    print(session)
+
+
+    return render_template('album_edit.html',album=album, photos=photos, musics=musics)
+
+@app.route('/delete')
+@user.login_required
+def delete():
+
+    file_id = session['album_id']
+    path = photo_file.get_path(session['album_id'])
+    before_thumbpath = path.find(str(session['album_id']))
+    thumbpath = path[:before_thumbpath]  + path[before_thumbpath:-4] + '-thumb' + '.jpg'
+    music_id = session['album_id']
+
+
+
+
+    os.remove(photo_file.get_path(file_id))
+    os.remove(thumbpath)
+    os.remove(photo_file.get_musicpath(music_id))
+
+    #本番用
+    exec('''
+    DELETE FROM  musics where album_id = ?
+    ''', session['album_id']
+    )
+
+    exec('''
+    DELETE FROM  files where album_id = ?
+    ''', session['album_id']
+    )
+
+
+    exec('''
+    DELETE FROM  albums where album_id = ?
+    ''', session['album_id']
+    )
+
+    #テスト用
+    # exec('''
+    # DELETE FROM  musics where album_id = ?
+    # ''', '3'
+    # )
+
+    # exec('''
+    # DELETE FROM  files where album_id = ?
+    # ''', '3'
+    # )
+
+
+    # exec('''
+    # DELETE FROM  albums where album_id = ?
+    # ''', '3'
+    # )
+
+
+
+    return redirect('/')
+
 
 
 # ユーザーがアップした画像の一覧を表示 --- (*4)
@@ -108,18 +201,25 @@ def upload_tryboth():
     upmusicfile = request.files.get('upmusicfile', None)
 
     user_id = session['login']
-
+    
+    #題名と説明文を追加
     name = request.form.get('album')
+    description = request.form.get('description')
     if name == "": return 0
-    exec('INSERT INTO albums (name, user_id) VALUES (?, ?)',
-            name, user_id)
+    exec('INSERT INTO albums (name, user_id, description) VALUES (?, ?, ?)',
+            name, user_id, description)
 
-
+    #youtubeURLを追加
+    # upyoutubeurl = request.url.get('upyoutubeurl', None)
+    # if upyoutubeurl =="": return 0
+    # exec('INSERT INTO musics(')
 
 
     title = select('''
         SELECT album_id FROM albums WHERE user_id = ? and name = ?  
     ''', user_id, name)
+
+
 
     album_id = title[0]['album_id']       
 
@@ -131,64 +231,19 @@ def upload_tryboth():
     return redirect('/user/' + str(user_id))
 
     
-    # if upphotofile is None: return msg('アップロード失敗')
-    # if upphotofile.filename == '': return msg('アップロード失敗')
-    # # どのアルバムに所属させるかをフォームから値を得る --- (*7)
-    # album_id = int(request.form.get('album', '0'))
-    # # ファイルの保存とデータベースへの登録を行う --- (*8)
-    # photo_id = photo_db.save_file(user.get_id(), upfile, album_id)
-    # if photo_id == 0: return msg('データベースのエラー')
+@app.route('/update', methods=['POST'])
+@user.login_required
+def update():
+    editalbumname = request.form.get('editalbumname')
+    editdescription = request.form.get('editdescription')
+    album_id=session['album_id']
 
+    exec('''
+    UPDATE albums SET name=?, description=? WHERE album_id=? 
+    ''', editalbumname, editdescription, album_id
+    )
 
-    # #アップロードされたファイルを確認
-    # upmusicfile = request.files.get('upmusicfile', None)
-    # if upmusicfile is None: return msg('アップロード失敗')
-    # if upmusicfile.filename == '': return msg('アップロード失敗')
-    # #どのアルバムに所属させるかをフォームから値を得る
-    # album_id = int(request.form.get('album', '0'))
-    # #ファイルの保存とデータベースへの登録を行う
-    # music_id = photo_db.save_file_music(user.get_id(), upmusicfile, album_id)
-    # if music_id ==0 :return msg('データベースのエラー')
-    # return redirect('/user/' + str(user.get_id()))
-
-
-# @app.route('/upload/try', methods=['POST'])
-# @user.login_required
-# def upload_try():
-#     # アップロードされたファイルを確認 --- (*6)
-#     upfile = request.files.get('upfile', None)
-#     if upfile is None: return msg('アップロード失敗')
-#     if upfile.filename == '': return msg('アップロード失敗')
-#     # どのアルバムに所属させるかをフォームから値を得る --- (*7)
-#     album_id = int(request.form.get('album', '0'))
-#     # ファイルの保存とデータベースへの登録を行う --- (*8)
-#     photo_id = photo_db.save_file(user.get_id(), upfile, album_id)
-#     if photo_id == 0: return msg('データベースのエラー')
-#     return redirect('/user/' + str(user.get_id()))
-
-# @app.route('/upload/try_music', methods=['POST'])
-# @user.login_required
-# def upload_try_music():
-#     #アップロードされたファイルを確認
-#     upmusicfile = request.files.get('upmusicfile', None)
-#     if upmusicfile is None: return msg('アップロード失敗')
-#     if upmusicfile.filename == '': return msg('アップロード失敗')
-#     #どのアルバムに所属させるかをフォームから値を得る
-#     album_id = int(request.form.get('album', '0'))
-#     #ファイルの保存とデータベースへの登録を行う
-#     music_id = photo_db.save_file_music(user.get_id(), upmusicfile, album_id)
-#     if music_id ==0 :return msg('データベースのエラー')
-#     return redirect('/user/' + str(user.get_id()))
-
-
-
-
-
-
-# #題名の作成機能
-# def title_new_try():
-#     id = photo_db.title_new(user.get_id(), request.args)
-#     return id
+    return redirect('/')
 
 
 
@@ -242,6 +297,10 @@ def music(music_id):
     #     return redirect('/album/str(album_id)')
 
 
+
+
+
+
 def msg(s):
     return render_template('msg.html', msg=s)
 
@@ -257,4 +316,5 @@ def staticfile_cp(fname):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 

@@ -29,7 +29,6 @@ CREATE TABLE musics(
   music_id    INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id     TEXT,
   musicname   TEXT,
-  musicurl    TEXT,
   album_id    INTEGER NOT NULL,
   created_aT  TIMESTAMP DEFAULT (DATETIME('now', 'localtime'))
 )
@@ -50,3 +49,15 @@ CREATE TABLE users(
 
 print('ok')
 
+
+# exec('''
+# /* 音楽情報 */
+# CREATE TABLE musics(
+#   music_id    INTEGER PRIMARY KEY AUTOINCREMENT,
+#   user_id     TEXT,
+#   musicname   TEXT,
+#   musicurl    TEXT,
+#   album_id    INTEGER NOT NULL,
+#   created_aT  TIMESTAMP DEFAULT (DATETIME('now', 'localtime'))
+# )
+# ''')

@@ -34,15 +34,16 @@ def try_login(form):
         print('ユーザリストのuserid' + USER_LOGIN_LIST[i]['user_id'])
         print('ユーザリストのpassword' +USER_LOGIN_LIST[i]['password'])
         if user != USER_LOGIN_LIST[i]['user_id'] and password != USER_LOGIN_LIST[i]['password']:
-            flash('存在しません。', 'failed')
+            print('存在しません。')
 
         elif user == USER_LOGIN_LIST[i]['user_id'] and password != USER_LOGIN_LIST[i]['password']:
-            flash('入力したパスワードが間違っています。', 'failed')
+            print('入力したパスワードが間違っています。')
 
         elif user != USER_LOGIN_LIST[i]['user_id'] and password == USER_LOGIN_LIST[i]['password']:
-            flash('入力したユーザidが間違っています。', 'failed')
+            print('入力したユーザidが間違っています。')
         else:
             session['login'] = user
+            session['user_id'] = user
             return True
 
 

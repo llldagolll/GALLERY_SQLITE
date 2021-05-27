@@ -1,7 +1,7 @@
 {% extends "layout_login.html" %}
 
 {% block title %}
-写真共有 &gt;<br>アップロード
+写真投稿
 {% endblock %}
 
 {% block contents %}
@@ -21,17 +21,22 @@
   <input type="file" name="upmusicfile" id="upmusicfile">
 </div>
 </div>
+
+<!-- <div class="pure-control-group">
+  <legend>yputubeURLを貼ってください</legend>
+<div class="pure-control-group">
+<label for="upmusicfile">URL:</label>
+ <input type="url" name="upyoutubeurl" id="upyoutubeurl"> -->
+<!-- </div> -->
+</div>
+
 <br>
       <label for="album">題名を入力してください</label>
-      <!-- <select name="album" id="album">
-        <option value="0">なし</option>
-        {% for i in albums %}
-          <option value="{{ i.album_id }}">
-            {{ i.name }}</option>
-        {% endfor %}
-      </select> -->
       <input type="text" name = "album" id = "album" required>
-
+      <br>
+      <br>  
+      <label for="description">説明文を入力してください</label>
+      <textarea name="description" id="description" cols="30" rows="10"></textarea>
     </div>
     <div class="pure-controls">
       <button type="submit" class="pure-button pure-button-primary">
