@@ -30,7 +30,9 @@ def try_login(form):
     password = form.get('pw', '')
     print('入力されたユーザid'+ user)
     print('入力されたpassword' + password)
-    for i in range(len(USER_LOGIN_LIST)):
+    userlen = len(USER_LOGIN_LIST)
+
+    for i in range(userlen):
         print('ユーザリストのuserid' + USER_LOGIN_LIST[i]['user_id'])
         print('ユーザリストのpassword' +USER_LOGIN_LIST[i]['password'])
         if user != USER_LOGIN_LIST[i]['user_id'] and password != USER_LOGIN_LIST[i]['password']:

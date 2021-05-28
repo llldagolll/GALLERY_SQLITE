@@ -2,7 +2,7 @@ from flask import Flask, redirect, request
 from flask import render_template, send_file
 import photo_db, sns_user as user # 自作モジュールを取り込む
 from photo_sqlite import exec, select
-from sns_user import session
+from sns_user import USER_LOGIN_LIST, session
 import os
 import photo_file
 
@@ -12,6 +12,8 @@ app.secret_key = 'dpwvgAxaY2iWHMb2'
 # ログイン画面表示--- (*1)
 @app.route('/login')
 def login():
+    print(USER_LOGIN_LIST)
+
     return render_template('login_form.html')
 
 #ログイン処理
